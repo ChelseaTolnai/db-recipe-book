@@ -8,11 +8,19 @@ function addDish(dish) {
     return db('dishes').insert(dish);
 }
 
-function getDish(id) {
-    return db('dishes')
-        .select('dishes.id as DishID', 'dishes.name as DishName', 'recipes.name as RecipeName')
-        .leftJoin('recipes', 'recipes.dish_id', 'dishes.id')
-        .where('dishes.id', id);
+async function getDish(id) {
+    // return db('dishes')
+    //     .select('dishes.id as DishID', 'dishes.name as DishName', 'recipes.name as RecipeName')
+    //     .leftJoin('recipes', 'recipes.dish_id', 'dishes.id')
+    //     .where('dishes.id', id)
+    const dish = await db('dishes')
+        .select('*')
+        .where({ id });
+    const recipes = await db('recipes')
+        .select('*')
+        .where('dish_id', id)
+        .map(dish => dish.name)
+    return dish.length ? {'dishID': id, 'dishName': dish[0].name, 'recipes': recipes} : null ;
 }
 
 function getRecipes() {
